@@ -13,10 +13,6 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-ttl{font-size:19px;font-weight:700;letter-spacing:.01em;margin:0;line-height:1.3}
 .kd-sub{font-size:11.5px;color:var(--ink2);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;white-space:normal}
 .kd-sub b{font-weight:600;color:var(--ink)}
-.kd-hd-right{display:flex;align-items:center;gap:16px;flex:none}
-.kd-hd-figure{text-align:right;flex:none}
-.kd-hd-figure em{font-family:"IBM Plex Mono",ui-monospace,monospace;font-style:normal;font-size:22px;font-weight:600}
-.kd-hd-figure div{font-size:10.5px;color:var(--ink2);margin-top:2px}
 .kd-reset-btn{flex:none;font:inherit;font-size:12px;padding:8px 14px;border:1px solid var(--line);
  border-radius:7px;background:#fff;color:var(--ink2);cursor:pointer;white-space:nowrap}
 .kd-reset-btn:hover{background:oklch(0.96 0.005 250);color:var(--ink)}
@@ -32,7 +28,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-search{width:100%;font:inherit;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;
  background:oklch(0.98 0.003 250);color:var(--ink)}
 .kd-search:focus{outline:2px solid var(--accent);outline-offset:-1px;background:#fff}
-.kd-info{padding:13px 18px 15px;border-bottom:1px solid var(--line);min-height:150px}
+.kd-info{padding:13px 18px 15px;border-bottom:1px solid var(--line);min-height:240px;box-sizing:border-box}
 .kd-info .p{font-size:11.5px;color:var(--ink2)}
 .kd-info .n{font-size:14.5px;font-weight:700;line-height:1.35;margin:1px 0 10px}
 .kd-big{display:flex;align-items:baseline;gap:7px}
@@ -42,6 +38,13 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-meta{margin-top:11px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11.5px;color:var(--ink2);align-items:center}
 .kd-meta b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:500;color:var(--ink);font-size:12px}
 .kd-hint{font-size:11.5px;color:var(--ink2);line-height:1.6}
+.kd-period-note{margin-top:10px;font-size:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.kd-stat-lab{margin-top:15px}
+.kd-stat-pair{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kd-stat{background:oklch(0.965 0.005 250);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.kd-stat em{font-family:"IBM Plex Mono",ui-monospace,monospace;font-style:normal;font-size:17px;font-weight:600;
+ letter-spacing:-.01em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kd-stat .l{font-size:10px;color:var(--ink2);line-height:1.45}
 .kd-badge{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;color:#fff;
  white-space:nowrap;line-height:1.5}
 .kd-delta{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600}
@@ -84,7 +87,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd[data-variant="m"] .kd-hd{padding:11px var(--pad) 0;display:block}
 .kd[data-variant="m"] .kd-ttl{font-size:15px;letter-spacing:0}
 .kd[data-variant="m"] .kd-sub{font-size:10px;gap:9px;margin-top:3px}
-.kd[data-variant="m"] .kd-hd-figure{text-align:left;margin:6px 0 10px}
+.kd[data-variant="m"] .kd-reset-btn{display:none}
 .kd[data-variant="m"] .kd-body{flex-direction:column;position:relative}
 .kd[data-variant="m"] .kd-map{flex:1;min-height:0}
 .kd-sheet{position:absolute;left:0;right:0;bottom:0;z-index:700;background:var(--panel);
@@ -207,16 +210,10 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
         '<b>2024年度末残高</b><span>全国 ' + this.feats.length + ' 保険者（2010〜2024年度）</span>' +
         '<span>出典：総務省・厚生労働省「介護保険事業状況報告」表15h</span>'));
       hd.appendChild(left);
-      const right = el('div', 'kd-hd-right');
       const resetBtn = el('button', 'kd-reset-btn', '↺ 初期表示に戻す');
       resetBtn.type = 'button';
       resetBtn.onclick = () => this.resetView();
-      right.appendChild(resetBtn);
-      const fig = el('div', 'kd-hd-figure');
-      const last = this.national.total_oku[this.national.total_oku.length - 1];
-      fig.innerHTML = '<em>' + fmt(last, 1) + '</em><div>全国合計（億円・2024年度末）</div>';
-      right.appendChild(fig);
-      hd.appendChild(right);
+      hd.appendChild(resetBtn);
       this.root.appendChild(hd);
 
       const body = el('div', 'kd-body'); this.root.appendChild(body);
@@ -327,7 +324,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       };
       this._fit = fit;
       fit(); setTimeout(fit, 120); setTimeout(fit, 500);
-      map.on('click', () => { if (Date.now() - (this._hit || 0) > 80) this.select(null); });
+      map.on('click', () => { if (Date.now() - (this._hit || 0) > 500) this.select(null); });
     }
     styleOf(f) {
       return {
@@ -352,10 +349,20 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       this.renderTrend();
     }
     focus(f) {
+      this._hit = Date.now();
       this.select(f);
       const b = f.__l.getBounds();
-      this.map.flyToBounds(b, { padding: [80, 80], maxZoom: 9, duration: .6 });
-      if (this.mobile) this.toggleSheet(false);
+      if (this.mobile) {
+        // the sheet is about to open to ~74% of the screen height, so keep the
+        // selected municipality within the strip that stays visible above it
+        const sheetPx = Math.round(this.map.getSize().y * 0.74);
+        this.map.flyToBounds(b, { paddingTopLeft: [30, 30], paddingBottomRight: [30, sheetPx + 24], maxZoom: 9, duration: .6 });
+        if (this.trendTab) this.trendTab.b.click();
+        this.toggleSheet(true);
+        this.renderTrend();
+      } else {
+        this.map.flyToBounds(b, { padding: [80, 80], maxZoom: 9, duration: .6 });
+      }
     }
     resetView() {
       this.query = '';
@@ -430,10 +437,10 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       rankWrap.appendChild(this.listBox());
       const distWrap = el('div'); distWrap.style.padding = '14px 15px 20px';
       distWrap.appendChild(this.trendBoxInner());
-      const searchWrap = el('div'); searchWrap.style.padding = '14px 15px 0';
+      const searchWrap = el('div'); searchWrap.style.padding = '14px 15px 0'; searchWrap.dataset.wantsList = '1';
       searchWrap.appendChild(this.searchBox());
       const first = mk('ランキング', rankWrap);
-      mk('全国推移', distWrap);
+      this.trendTab = mk('全国推移', distWrap);
       const sw = mk('検索', searchWrap);
       sw.b.onclick = ((orig) => () => { orig(); const i = searchWrap.querySelector('input'); if (i) setTimeout(() => i.focus(), 60); })(sw.b.onclick);
       sheet.appendChild(tabs);
@@ -449,10 +456,11 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       frag.appendChild(this.trend);
       return frag;
     }
-    toggleSheet(force) {
+    toggleSheet(force, opts) {
       const open = force != null ? force : this.sheet.dataset.open !== '1';
+      const skipFit = opts && opts.skipFit;
       this.sheet.dataset.open = open ? '1' : '0';
-      setTimeout(() => { if (this.map) { this.map.invalidateSize(); if (!open && this._fit) this._fit(); } }, 320);
+      setTimeout(() => { if (this.map) { this.map.invalidateSize(); if (!open && !skipFit && this._fit) this._fit(); } }, 320);
     }
     renderPeek() {
       if (!this.peek) return;
@@ -489,16 +497,38 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       const sign = v > 0 ? '+' : '';
       return '<span class="kd-delta ' + (v >= 0 ? 'up' : 'down') + '">' + sign + fmt(v, 1) + '</span>';
     }
+    classCounts() {
+      if (this._classCounts) return this._classCounts;
+      const c = { up: 0, valley: 0, mountain: 0, other: 0 };
+      this.feats.forEach(f => {
+        const cls = f.properties[CLASS_KEY];
+        if (cls === '一貫して増加' || cls === '増減のくり返し（増加傾向）') c.up++;
+        else if (cls === '谷型') c.valley++;
+        else if (cls === '山形') c.mountain++;
+        else c.other++;
+      });
+      this._classCounts = c;
+      return c;
+    }
 
     showInfo(f) {
       if (this.mobile) return this.showInfoM(f);
       const st = this.st;
       if (!f) {
+        const c = this.classCounts();
+        const totalOku = this.national.total_oku[this.national.total_oku.length - 1];
         this.info.innerHTML =
-          '<div class="p">全国 ' + this.feats.length + ' 保険者の中央値</div>' +
-          '<div class="kd-big"><em>' + fmt(st.median, 1) + '</em><span>億円（2024年度末）</span></div>' +
-          '<div class="kd-hint" style="margin-top:12px">地図上の市区町村にカーソルを合わせると詳細、' +
-          'クリックすると固定表示になります。</div>';
+          '<div class="p">全国 ' + this.feats.length + ' 保険者</div>' +
+          '<p class="kd-lab kd-stat-lab" style="margin-top:2px">2024年度末の残高</p>' +
+          '<div class="kd-stat-pair">' +
+          '<div class="kd-stat"><em>' + fmt(totalOku, 1) + '</em><div class="l">全国合計（億円）</div></div>' +
+          '<div class="kd-stat"><em>' + fmt(st.median, 1) + '</em><div class="l">中央値（億円）</div></div>' +
+          '</div>' +
+          '<p class="kd-lab kd-stat-lab">15年間の全国的な傾向</p>' +
+          '<div class="kd-stat-pair">' +
+          '<div class="kd-stat"><em>' + c.up.toLocaleString('ja-JP') + ' / ' + this.feats.length.toLocaleString('ja-JP') + '</em><div class="l">増加傾向の自治体</div></div>' +
+          '<div class="kd-stat"><em>第5期→第8期</em><div class="l">2012〜14→2021〜23年度</div></div>' +
+          '</div>';
         this.markVal = null; return;
       }
       const p = f.properties, v = p[VALUE_KEY];
@@ -511,7 +541,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
         '<span>分類</span>' + this.classBadge(p[CLASS_KEY]) +
         '<span>第5期→8期 増減率</span>' + this.deltaSpan(p[P58_KEY]) +
         '<span>2010→2024 増減率</span>' + this.deltaSpan(p[P1024_KEY]) +
-        '</div>';
+        '</div>' +
+        '<div class="kd-hint kd-period-note">第5期は2012〜14年度、第8期は2021〜23年度の平均残高</div>';
       this.markVal = v;
     }
     showInfoM(f) {
@@ -521,7 +552,9 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
           '<div class="txt"><div class="p">全国 ' + this.feats.length + ' 保険者</div>' +
           '<div class="n">中央値（2024年度末）</div></div>' +
           '<div class="num"><em>' + fmt(st.median, 1) + '</em><u>億円</u></div>';
-        this.mrank.innerHTML = '<span>最小 <b>' + fmt(st.min, 1) + '</b> 億円</span>' +
+        const totalOku = this.national.total_oku[this.national.total_oku.length - 1];
+        this.mrank.innerHTML = '<span>全国合計 <b>' + fmt(totalOku, 1) + '</b> 億円</span>' +
+          '<span>最小 <b>' + fmt(st.min, 1) + '</b> 億円</span>' +
           '<span>最大 <b>' + fmt(st.max, 1) + '</b> 億円</span>';
         this.markVal = null; return;
       }
