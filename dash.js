@@ -322,7 +322,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       const fit = () => {
         map.invalidateSize();
         const pad = this.mobile ? (this.sheet && this.sheet.dataset.open === '1' ? 0 : this.sheet ? this.sheet.offsetHeight : 190) : 0;
-        map.fitBounds(this.layer.getBounds(), { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10 + pad], maxZoom: 6 });
+        map.fitBounds(this.layer.getBounds(), { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10 + pad], maxZoom: 6, animate: false });
         map.setZoom(map.getZoom() + 1, { animate: false });
       };
       this._fit = fit;
@@ -368,7 +368,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
         const a = valSpan.querySelector('.a'); if (a) a.textContent = '↓';
       }
       this.select(null);
-      if (this._fit) this._fit();
+      if (this._fit) { this._fit(); setTimeout(this._fit, 120); setTimeout(this._fit, 400); }
     }
 
     /* ---------- mobile sheet ---------- */
