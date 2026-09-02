@@ -208,7 +208,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       left.appendChild(el('h1', 'kd-ttl', '全国市区町村別　介護給付費準備基金マップ'));
       left.appendChild(el('div', 'kd-sub',
         '<b>2024年度末残高</b><span>全国 ' + this.feats.length + ' 保険者（2010〜2024年度）</span>' +
-        '<span>出典：総務省・厚生労働省「介護保険事業状況報告」表15h</span>'));
+        '<span>出典：総務省・厚生労働省「介護保険事業状況報告」表15h</span>' +
+        '<span>元データの「-」はデータの欠損扱いとした</span>'));
       hd.appendChild(left);
       const resetBtn = el('button', 'kd-reset-btn', '↺ 初期表示に戻す');
       resetBtn.type = 'button';
@@ -321,6 +322,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
         const pad = this.mobile ? (this.sheet && this.sheet.dataset.open === '1' ? 0 : this.sheet ? this.sheet.offsetHeight : 190) : 0;
         map.fitBounds(this.layer.getBounds(), { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10 + pad], maxZoom: 6, animate: false });
         map.setZoom(map.getZoom() + 1, { animate: false });
+        // nudge the initial view slightly east
+        map.panBy([map.getSize().x * 0.06, 0], { animate: false });
       };
       this._fit = fit;
       fit(); setTimeout(fit, 120); setTimeout(fit, 500);
