@@ -62,7 +62,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-scale div{flex:1;height:8px}
 .kd-scale-l{display:flex;justify-content:space-between;font-size:9px;color:var(--ink2);margin-top:5px;gap:4px}
 .kd-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 14px 8px}
-.kd-thead{display:grid;grid-template-columns:26px 1fr 82px 130px 82px 76px;gap:6px;align-items:center;
+.kd-thead{display:grid;grid-template-columns:26px 1fr 82px 130px 82px 76px 82px;gap:6px;align-items:center;
  padding:8px 8px 7px;position:sticky;top:0;background:var(--panel);z-index:2;border-bottom:1px solid var(--line)}
 .kd-thead span{font-size:10px;color:var(--ink2);font-weight:600;letter-spacing:.02em;cursor:pointer;
  user-select:none;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -70,7 +70,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-thead span.on{color:var(--ink)}
 .kd-thead span .a{opacity:.35;margin-left:2px;font-size:9px}
 .kd-thead span.on .a{opacity:1;color:var(--accent)}
-.kd-row{display:grid;grid-template-columns:26px 1fr 82px 130px 82px 76px;align-items:center;gap:6px;padding:7px 8px;
+.kd-row{display:grid;grid-template-columns:26px 1fr 82px 130px 82px 76px 82px;align-items:center;gap:6px;padding:7px 8px;
  border-radius:6px;cursor:pointer;font-size:12px}
 .kd-row:hover,.kd-row[data-on="1"]{background:oklch(0.955 0.006 250)}
 .kd-row .r{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink2);text-align:right}
@@ -118,9 +118,9 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
 .kd-sheet:not([data-open="1"]) .kd-peek{display:block}
 .kd-peek{display:none;padding:0 var(--pad) 14px}
 .kd[data-variant="m"] .kd-thead{grid-template-columns:22px 1fr 58px 50px 50px;padding:8px var(--pad) 7px}
-.kd[data-variant="m"] .kd-thead span:nth-child(4){display:none}
+.kd[data-variant="m"] .kd-thead span:nth-child(4),.kd[data-variant="m"] .kd-thead span:nth-child(7){display:none}
 .kd[data-variant="m"] .kd-row{grid-template-columns:22px 1fr 58px 50px 50px;padding:9px var(--pad);min-height:44px;font-size:13px}
-.kd[data-variant="m"] .kd-row span:nth-child(4){display:none}
+.kd[data-variant="m"] .kd-row span:nth-child(4),.kd[data-variant="m"] .kd-row span:nth-child(7){display:none}
 .kd[data-variant="m"] .kd-row .nm{font-size:13px}
 .kd[data-variant="m"] .kd-search{font-size:16px;padding:11px 12px}
 .kd[data-variant="m"] .leaflet-control-zoom{display:none}
@@ -147,6 +147,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
   const CLASS_KEY = '分類';
   const P58_KEY = '第5期8期増減率';
   const P1024_KEY = '2010_2024増減率';
+  const PREM9_KEY = '第9期保険料基準額';
   const CHG_KEY = '2010_2024増減額';
   const SERIES_KEY = '残高推移';
 
@@ -231,7 +232,7 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
         rail.appendChild(this.searchBox());
         rail.appendChild(this.listBox());
         rail.appendChild(el('div', 'kd-src',
-          '2024年度末残高は千円単位の原値を億円に換算。第5期→8期は2012〜14年度平均から2021〜23年度平均への変化率、増減額は2010年度末から2024年度末の残高差（億円）。分類は15年間の増減方向の完全な単調判定による7区分。'));
+          '2024年度末残高は千円単位の原値を億円に換算。第5期→8期は2012〜14年度平均から2021〜23年度平均への変化率、増減額は2010年度末から2024年度末の残高差（億円）。分類は15年間の増減方向の完全な単調判定による7区分。9期保険料は第9期（2024〜26年度）の65歳以上・月額保険料基準額。全国合計は原資料の「全国」欄の値で、広域連合・一部事務組合分を含むため、自治体別データの合計とは一致しない。'));
         body.appendChild(this.mapWrap); body.appendChild(rail);
       }
 
@@ -264,7 +265,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       const cols = [
         ['rank', '順位', false], ['name', '自治体', false],
         ['val', '2024残高', true], ['cls', '分類', true],
-        ['p58', '5→8期', true], ['chg', '増減額', true]
+        ['p58', '5→8期', true], ['chg', '増減額', true],
+        ['prem9', '9期保険料', true]
       ];
       const head = el('div', 'kd-thead');
       cols.forEach(([key, label, sortable]) => {
@@ -705,8 +707,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       const st = this.st, q = (this.query || '');
       let rows = this.feats.slice();
       if (q) rows = rows.filter(f => (f.properties['市区町村'] + f.properties['都道府県']).includes(q));
-      const keyMap = { val: VALUE_KEY, cls: CLASS_KEY, p58: P58_KEY, p1024: P1024_KEY, chg: CHG_KEY };
-      if (['p58', 'p1024', 'chg'].includes(this.sortKey)) {
+      const keyMap = { val: VALUE_KEY, cls: CLASS_KEY, p58: P58_KEY, p1024: P1024_KEY, chg: CHG_KEY, prem9: PREM9_KEY };
+      if (['p58', 'p1024', 'chg', 'prem9'].includes(this.sortKey)) {
         const key = keyMap[this.sortKey];
         rows = rows.filter(f => f.properties[key] != null);
       }
@@ -742,7 +744,8 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
           '<span class="val">' + fmt(v, 1) + '<span class="bar"><i style="width:' + barPct.toFixed(1) + '%"></i></span></span>' +
           '<span class="cl">' + this.classBadge(p[CLASS_KEY]) + '</span>' +
           '<span class="pc">' + this.deltaSpan(p[P58_KEY]) + '</span>' +
-          '<span class="pc">' + this.deltaAmountSpan(p[CHG_KEY]) + '</span>';
+          '<span class="pc">' + this.deltaAmountSpan(p[CHG_KEY]) + '</span>' +
+          '<span class="pc">' + (p[PREM9_KEY] != null ? fmt(p[PREM9_KEY], 0) + '円' : '—') + '</span>';
         r.onmouseenter = () => { if (!this.selected) this.showInfo(f); if (f.__l) this.hover(f.__l, true); };
         r.onmouseleave = () => { if (!this.selected) this.showInfo(null); if (f.__l) this.hover(f.__l, false); };
         r.onclick = () => this.focus(f);
