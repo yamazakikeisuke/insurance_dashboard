@@ -338,6 +338,13 @@ kaigo-dash{display:block;width:100%;height:100%;flex:1 1 auto;min-width:0}
       }).addTo(map);
       const fit = () => {
         map.invalidateSize();
+        if (this.mobile) {
+          // 縦長画面では全域（先島諸島まで）を入れると本土が上に寄り海が中心になるため、
+          // 北海道〜九州の範囲を下部シートより上の見える領域に収める
+          const sheetH = this.sheet && this.sheet.dataset.open !== '1' ? this.sheet.offsetHeight : 190;
+          map.fitBounds([[31.0, 129.6], [45.55, 145.8]], { paddingTopLeft: [8, 8], paddingBottomRight: [8, sheetH + 8], animate: false });
+          return;
+        }
         const pad = this.mobile ? (this.sheet && this.sheet.dataset.open === '1' ? 0 : this.sheet ? this.sheet.offsetHeight : 190) : 0;
         map.fitBounds(this.layer.getBounds(), { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10 + pad], maxZoom: 6, animate: false });
         map.setZoom(map.getZoom() + 1, { animate: false });
